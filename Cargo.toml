@@ -1,0 +1,12 @@
+[package]
+name = "git-bump"
+version = "0.0.0"
+authors = ["buck <buckhx@gmail.com>"]
+
+[dependencies.clap]
+clap = "2"
+default-features = false
+features = ["suggestions", "color", "wrap_help", "yaml"]
+
+[dependencies]
+git2 = "0.6"

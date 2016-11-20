@@ -1,0 +1,34 @@
+name: git-bump
+version: 0.0.0
+author: Buck <buckhx@gmail.com>
+about: Bumps git version v<MAJOR>.<MINOR>.<PATCH>-<EXT>
+args:
+    - dry:
+        short: n
+        long: dry-run
+        help: Print result only, do not create tag
+    - config:
+        short: c
+        long: config
+        value_name: FILE
+        help: Sets a custom .gitconfig file
+        takes_value: true
+    - extra:
+        short: e
+        long: ext
+        help: Extra info appended to version (beta, rc.1)
+    - patch:
+        long: patch 
+        help: Bumps PATCH [default]
+    - minor:
+        long: minor 
+        help: Bumps MINOR version, resets PATCH
+    - major:
+        long: major
+        help: Bumps MAJOR version, resets MINOR and PATCH
+    - force:
+        short: f
+        long: force
+        value_name: VERSION
+        help: Set to this exact version
+        takes_value: true
