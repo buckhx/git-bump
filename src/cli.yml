@@ -7,16 +7,6 @@ args:
         short: n
         long: dry-run
         help: Print result only, do not create tag
-    - config:
-        short: c
-        long: config
-        value_name: FILE
-        help: Sets a custom .gitconfig file
-        takes_value: true
-    - extra:
-        short: e
-        long: ext
-        help: Extra info appended to version (beta, rc.1)
     - patch:
         long: patch 
         help: Bumps PATCH [default]
@@ -26,9 +16,3 @@ args:
     - major:
         long: major
         help: Bumps MAJOR version, resets MINOR and PATCH
-    - force:
-        short: f
-        long: force
-        value_name: VERSION
-        help: Set to this exact version
-        takes_value: true

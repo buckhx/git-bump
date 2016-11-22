@@ -1,54 +1,112 @@
+use git2;
+use regex;
+
+// const SEMVER_FORMAT: &'static str = "v{MAJOR}.{MINOR}.{PATCH}";
+const SEMVER_REGEX: &'static str = r"v(?P<MAJOR>\d+).(?P<MINOR>\d+).(?P<PATCH>\d+)";
+lazy_static! {
+    static ref RE: regex::Regex = regex::Regex::new(SEMVER_REGEX).unwrap();
+}
+
+#[derive(Debug)]
 pub struct Version {
     rel: ReleaseType,
-    major: u8,
-    minor: u8,
-    patch: u8,
-    ext: String,
-    tag: String,
+    major: u16,
+    minor: u16,
+    patch: u16,
 }
 
 impl Version {
-    pub fn init() -> Version {
-        let tag = "fake-tag".to_string();
-        Version {
-            tag: tag,
-            rel: ReleaseType::GIT,
-        }
+    // init from a git directory path
+    pub fn init(dir: &str) -> Result<Version, String> {
+        let repo = try!(git2::Repository::open(dir).map_err(|e| e.to_string()));
+        let desc = try!(repo.describe(&git2::DescribeOptions::new().describe_tags())
+            .map_err(|e| String::from(e.message())));
+        let tag = try!(desc.format(Some(&git2::DescribeFormatOptions::new()))
+            .map_err(|e| e.to_string()));
+        let v = try!(Version::from_tag(tag));
+        return Ok(v);
     }
-    fn parse_tag() -> Version {}
+
+    // from_tag builds from a tagged string
+    pub fn from_tag(tag: String) -> Result<Version, String> {
+        let caps = match RE.captures(&tag) {
+            None => return Err(String::from("Tag did not match semver format")),
+            Some(caps) => caps, 
+        };
+        let major = caps.name("MAJOR").unwrap().parse::<u16>().unwrap();
+        let minor = caps.name("MINOR").unwrap().parse::<u16>().unwrap();
+        let patch = caps.name("PATCH").unwrap().parse::<u16>().unwrap();
+        let vers = Version {
+            major: major,
+            minor: minor,
+            patch: patch,
+            rel: ReleaseType::COMMIT,
+        };
+        return Ok(vers);
+    }
+
+    pub fn tag(&self) -> String {
+        return format!("v{MAJOR}.{MINOR}.{PATCH}",
+                       MAJOR = self.major,
+                       MINOR = self.minor,
+                       PATCH = self.patch);
+    }
+
     pub fn bump(&self, rel: ReleaseType) -> Version {
         match rel {
             ReleaseType::MAJOR => self.bump_major(),
             ReleaseType::MINOR => self.bump_minor(),
-            ReleaseType::PATCH => self.bump_patch(),
+            _ => self.bump_patch(),
         }
     }
-    pub fn force(&self, tag: String) -> Version {
+
+    pub fn set_tag(&self) -> Result<(), String> {
+        let repo = try!(git2::Repository::open(".").map_err(|e| e.to_string()));
+        let rev = try!(repo.revparse_single("HEAD").map_err(|e| e.to_string()));
+        try!(repo.tag_lightweight(self.tag().as_str(), &rev, false).map_err(|e| e.to_string()));
+        return Ok(());
+    }
+
+    fn bump_major(&self) -> Version {
         return Version {
-            tag: tag,
-            rel: ReleaseType::FORCE,
+            rel: ReleaseType::MAJOR,
+            major: self.major + 1,
+            minor: 0,
+            patch: 0,
         };
     }
-    fn bump_major(&self) -> Version {}
-    fn bump_minor(&self) -> Version {}
-    fn bump_patch(&self) -> Version {}
+
+    fn bump_minor(&self) -> Version {
+        return Version {
+            rel: ReleaseType::MINOR,
+            minor: self.minor + 1,
+            patch: 0,
+            ..*self
+        };
+    }
+    fn bump_patch(&self) -> Version {
+        return Version {
+            rel: ReleaseType::PATCH,
+            patch: self.patch + 1,
+            ..*self
+        };
+    }
 }
 
-enum ReleaseType {
+#[derive(Debug, Copy, Clone)]
+pub enum ReleaseType {
     MAJOR,
     MINOR,
     PATCH,
-    FORCE,
     COMMIT,
 }
 
 impl ReleaseType {
-    fn string(&self) -> &str {
+    pub fn string(&self) -> &str {
         match *self {
             ReleaseType::MAJOR => "major",
             ReleaseType::MINOR => "minor",
             ReleaseType::PATCH => "patch",
-            ReleaseType::FORCE => "force", 
             ReleaseType::COMMIT => "commit", 
         }
     }

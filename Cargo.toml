@@ -10,3 +10,5 @@ features = ["suggestions", "color", "wrap_help", "yaml"]
 
 [dependencies]
 git2 = "0.6"
+regex = "0.1"
+lazy_static = "0.2.2"
