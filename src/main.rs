@@ -16,6 +16,7 @@ fn cli() -> Result<String, String> {
     let yaml = load_yaml!("cli.yml");
     let matches = App::from_yaml(yaml)
         .group(ArgGroup::with_name("vers").args(&["init", "major", "minor", "patch"]))
+        .version(crate_version!())
         .get_matches();
     let mut ver = try!(Version::from_tag(ZERO_TAG.to_string()));
     if matches.is_present("init") {
