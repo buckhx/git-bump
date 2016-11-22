@@ -1,7 +1,6 @@
 name: git-bump
-version: 0.0.0
 author: Buck <buckhx@gmail.com>
-about: Bumps git version v<MAJOR>.<MINOR>.<PATCH>-<EXT>
+about: Bumps git version with semver semantics
 args:
     - dry:
         short: n
