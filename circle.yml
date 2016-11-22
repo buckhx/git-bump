@@ -1,0 +1,31 @@
+machine:
+  environment:
+   PATH: "${HOME}/.cargo/bin:${PATH}"
+
+general:
+  artifacts:
+    - target
+
+dependencies:
+  cache_directories:
+    - ~/.multirust
+    - ~/.cargo
+    - target
+  pre:
+    - curl https://sh.rustup.rs -sSf | sh -s -- -y
+    - cp ~/.gitconfig ~/.gitconfig.og && echo "" > ~/.gitconfig
+  override:
+    - make build
+
+test:
+  override:
+    - make test
+
+deployment:
+  release:
+    tag: /v[0-9]+(\.[0-9]+)*/
+    owner: buckhx 
+    commands:
+      - make release
+      - sudo ./bin/install_ghr.sh
+      - ghr -u the-infatuation -r registry-sdk $(make version) dist

@@ -68,8 +68,8 @@ impl Version {
         match repo.describe(&git2::DescribeOptions::new()
             .describe_tags()
             .max_candidates_tags(0)) {
-            Err(err) => (),
-            Ok(v) => return Err(String::from("Spec already has tag")),
+            Err(_) => (),
+            Ok(_) => return Err(String::from("Spec already has tag")),
         }
         let rev = try!(repo.revparse_single(spec).map_err(|e| e.to_string()));
         try!(repo.tag_lightweight(self.tag().as_str(), &rev, false).map_err(|e| e.to_string()));
