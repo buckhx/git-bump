@@ -1,3 +1,3 @@
 # git-bump
 
-Bumps a git project version
+Bumps a git project version using semver semantics

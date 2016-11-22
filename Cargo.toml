@@ -4,8 +4,7 @@ version = "0.0.0"
 authors = ["buck <buckhx@gmail.com>"]
 
 [dependencies.clap]
-clap = "2"
-default-features = false
+version = "2"
 features = ["suggestions", "color", "wrap_help", "yaml"]
 
 [dependencies]

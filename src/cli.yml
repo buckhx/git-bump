@@ -16,3 +16,6 @@ args:
     - major:
         long: major
         help: Bumps MAJOR version, resets MINOR and PATCH
+    - init:
+        long: init 
+        help: Sets version to v0.0.1 

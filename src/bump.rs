@@ -19,6 +19,7 @@ impl Version {
     // init from a git directory path
     pub fn init(dir: &str) -> Result<Version, String> {
         let repo = try!(git2::Repository::open(dir).map_err(|e| e.to_string()));
+        // TODO hint --init
         let desc = try!(repo.describe(&git2::DescribeOptions::new().describe_tags())
             .map_err(|e| String::from(e.message())));
         let tag = try!(desc.format(Some(&git2::DescribeFormatOptions::new()))
