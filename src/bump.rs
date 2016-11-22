@@ -31,6 +31,7 @@ impl Version {
     // from_tag builds from a tagged string
     pub fn from_tag(tag: String) -> Result<Version, String> {
         let caps = match RE.captures(&tag) {
+            // TODO show tag
             None => return Err(String::from("Tag did not match semver format")),
             Some(caps) => caps, 
         };
@@ -62,8 +63,15 @@ impl Version {
     }
 
     pub fn set_tag(&self) -> Result<(), String> {
+        let spec = "HEAD";
         let repo = try!(git2::Repository::open(".").map_err(|e| e.to_string()));
-        let rev = try!(repo.revparse_single("HEAD").map_err(|e| e.to_string()));
+        match repo.describe(&git2::DescribeOptions::new()
+            .describe_tags()
+            .max_candidates_tags(0)) {
+            Err(err) => (),
+            Ok(v) => return Err(String::from("Spec already has tag")),
+        }
+        let rev = try!(repo.revparse_single(spec).map_err(|e| e.to_string()));
         try!(repo.tag_lightweight(self.tag().as_str(), &rev, false).map_err(|e| e.to_string()));
         return Ok(());
     }
