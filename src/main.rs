@@ -18,11 +18,11 @@ fn cli() -> Result<String, String> {
         .group(ArgGroup::with_name("vers").args(&["init", "major", "minor", "patch"]))
         .version(crate_version!())
         .get_matches();
-    let mut ver = try!(Version::from_tag(ZERO_TAG.to_string()));
+    let mut vers = try!(Version::from_tag(ZERO_TAG.to_string()));
     if matches.is_present("init") {
         println!("Initializing first bump");
     } else {
-        ver = try!(Version::init("."));
+        vers = try!(Version::init("."));
     }
     let mut rel = ReleaseType::PATCH;
     if matches.is_present("major") {
@@ -30,7 +30,7 @@ fn cli() -> Result<String, String> {
     } else if matches.is_present("minor") {
         rel = ReleaseType::MINOR;
     }
-    let bumped = ver.bump(rel);
+    let bumped = vers.bump(rel);
     if matches.is_present("dry") {
         println!("DRY RUN: No changes will be made.");
     } else {

@@ -2,14 +2,14 @@ VERSION=$(shell git describe --always --tags)
 TARGET="x86_64-apple-darwin"
 
 build:
-	cargo bump $(shell grep -oh -E "[^v]+" <<< ${VERSION})
+	cargo bump $(shell grep -oh -E "[^v]+" <<< ${VERSION}) || true
 	cargo build
 
 test:
 	cargo test
 
-release:
-	cargo bump $(shell grep -oh -E "[^v]+" <<< ${VERSION})
+release: test
+	cargo bump $(shell grep -oh -E "[^v]+" <<< ${VERSION}) || true
 	cargo build --release
 	@git describe --tags --exact-match
 	@cp target/release/git-bump target/release/git-bump_${TARGET}

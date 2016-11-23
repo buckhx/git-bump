@@ -19,20 +19,20 @@ impl Version {
     // init from a git directory path
     pub fn init(dir: &str) -> Result<Version, String> {
         let repo = try!(git2::Repository::open(dir).map_err(|e| e.to_string()));
-        // TODO hint --init
         let desc = try!(repo.describe(&git2::DescribeOptions::new().describe_tags())
-            .map_err(|e| String::from(e.message())));
+            .map_err(|e| format!("{} (try --init)", e.message())));
         let tag = try!(desc.format(Some(&git2::DescribeFormatOptions::new()))
             .map_err(|e| e.to_string()));
-        let v = try!(Version::from_tag(tag));
-        return Ok(v);
+        let vers = try!(Version::from_tag(tag));
+        return Ok(vers);
     }
 
     // from_tag builds from a tagged string
     pub fn from_tag(tag: String) -> Result<Version, String> {
         let caps = match RE.captures(&tag) {
-            // TODO show tag
-            None => return Err(String::from("Tag did not match semver format")),
+            None => {
+                return Err(format!("Latest tag '{}' did not match semver format 'v0.0.0'", tag))
+            }
             Some(caps) => caps, 
         };
         let major = caps.name("MAJOR").unwrap().parse::<u16>().unwrap();
@@ -131,5 +131,6 @@ mod tests {
         assert_eq!("v5.5.6", ver.bump(ReleaseType::PATCH).tag());
         assert_eq!("v5.6.0", ver.bump(ReleaseType::MINOR).tag());
         assert_eq!("v6.0.0", ver.bump(ReleaseType::MAJOR).tag());
+        // TODO assert bad tag
     }
 }
