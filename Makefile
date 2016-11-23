@@ -5,6 +5,9 @@ build:
 	cargo bump $(shell grep -oh -E "[^v]+" <<< ${VERSION})
 	cargo build
 
+test:
+	cargo test
+
 release:
 	cargo build --release
 	@git describe --tags --exact-match

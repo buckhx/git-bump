@@ -120,3 +120,16 @@ impl ReleaseType {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn smoke() {
+        let ver = Version::from_tag(String::from("v5.5.5")).ok().unwrap();
+        assert_eq!("v5.5.6", ver.bump(ReleaseType::PATCH).tag());
+        assert_eq!("v5.6.0", ver.bump(ReleaseType::MINOR).tag());
+        assert_eq!("v6.0.0", ver.bump(ReleaseType::MAJOR).tag());
+    }
+}

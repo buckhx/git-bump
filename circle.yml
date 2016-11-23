@@ -1,10 +1,11 @@
 machine:
   environment:
    PATH: "${HOME}/.cargo/bin:${PATH}"
+   TARGET: "x86_64-unknown-linux-gnu"
 
 general:
   artifacts:
-    - target
+    - dist 
 
 dependencies:
   cache_directories:
@@ -14,6 +15,7 @@ dependencies:
   pre:
     - curl https://sh.rustup.rs -sSf | sh -s -- -y
     - cp ~/.gitconfig ~/.gitconfig.og && echo "" > ~/.gitconfig
+    - cargo install cargo-bump -q || true
   override:
     - make build
 
@@ -26,6 +28,8 @@ deployment:
     tag: /v[0-9]+(\.[0-9]+)*/
     owner: buckhx 
     commands:
-      - make release
+      - mkdir dist
       - sudo ./bin/install_ghr.sh
-      - ghr -u the-infatuation -r registry-sdk $(make version) dist
+      - cargo build --release
+      - cp target/release/git-bump dist/git-bump_$TARGET
+      - ghr -u buckhx -r git-bump $CIRCLE_TAG dist/git-bump_$TARGET 
