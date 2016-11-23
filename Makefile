@@ -9,10 +9,10 @@ test:
 	cargo test
 
 release:
+	cargo bump $(shell grep -oh -E "[^v]+" <<< ${VERSION})
 	cargo build --release
 	@git describe --tags --exact-match
 	@cp target/release/git-bump target/release/git-bump_${TARGET}
-	cargo bump $(shell grep -oh -E "[^v]+" <<< ${VERSION})
 	ghr -u buckhx -r git-bump ${VERSION} target/release/git-bump_${TARGET}
 
 version:

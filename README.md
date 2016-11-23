@@ -4,7 +4,7 @@ Bumps a git project version using semver semantics
 
 ## Installation
 
-Run the following commaned to download the right binary and put it in your path
+Run the following commaned to download the right binary and put it in your path. Install script only works on OSX for now.
 
     curl -sSL https://raw.githubusercontent.com/buckhx/git-bump/master/bin/install.py | sudo python - /usr/local/bin
     
