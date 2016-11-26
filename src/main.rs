@@ -20,6 +20,14 @@ fn cli() -> Result<String, String> {
         .group(ArgGroup::with_name("vers").args(&["init", "major", "minor", "patch"]))
         .version(crate_version!())
         .get_matches();
+    if matches.is_present("uninstall") {
+        // TODO confirmation
+        let exe = std::env::current_exe().unwrap();
+        std::fs::remove_file(exe.as_path()).unwrap();
+        return Ok(format!("Removed git-bump from {}\nTo install again see \
+                           https://github.com/buckhx/git-bump/",
+                          exe.display()));
+    }
     // Init Version
     let path = matches.value_of("path").unwrap_or(".");
     let mut vers = try!(Version::from_tag(path, ZERO_TAG.to_string()));

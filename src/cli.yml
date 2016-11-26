@@ -29,3 +29,6 @@ args:
     - init:
         long: init 
         help: Sets version to v0.0.1 
+    - uninstall:
+        long: uninstall
+        help: Removes git-bump from the system
