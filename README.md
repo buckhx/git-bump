@@ -6,7 +6,7 @@ The only _currently_ supported tag format is v.{MAJOR}.{MINOR}.{PATCH}
 
 ## Installation
 
-For OSX, run the following commaned to download the correct binary and put it in your path.
+For OSX, run the following commaned to download the correct binary and put it in your path. To upgrade, run this same script and it will replace the old binary.
 
     curl -sSL https://raw.githubusercontent.com/buckhx/git-bump/master/bin/install.py | sudo python - /usr/local/bin
 
