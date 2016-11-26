@@ -6,6 +6,17 @@ args:
         short: n
         long: dry-run
         help: Print result only, do not create tag
+      #- push:
+      #  long: push
+      #  short: p 
+      #  empty_values: true
+      #  value_name: remote
+      #  help: Push tags to origin or <remote>
+    - path:
+        short: C
+        takes_value: true
+        value_name: path
+        help: Run as if git was started in <path>
     - patch:
         long: patch 
         help: Bumps PATCH [default]

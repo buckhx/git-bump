@@ -2,33 +2,35 @@ use git2;
 use regex;
 
 // const SEMVER_FORMAT: &'static str = "v{MAJOR}.{MINOR}.{PATCH}";
+//
+const REFSPECS: &'static str = "refs/tags/*:refs/tags/*";
 const SEMVER_REGEX: &'static str = r"v(?P<MAJOR>\d+).(?P<MINOR>\d+).(?P<PATCH>\d+)";
 lazy_static! {
     static ref RE: regex::Regex = regex::Regex::new(SEMVER_REGEX).unwrap();
 }
 
-#[derive(Debug)]
-pub struct Version {
-    rel: ReleaseType,
+pub struct Version<'a> {
     major: u16,
     minor: u16,
     patch: u16,
+    path: &'a str,
+    rel: ReleaseType,
 }
 
-impl Version {
+impl<'a> Version<'a> {
     // init from a git directory path
-    pub fn init(dir: &str) -> Result<Version, String> {
-        let repo = try!(git2::Repository::open(dir).map_err(|e| e.to_string()));
+    pub fn from_repo(path: &str) -> Result<Version, String> {
+        let repo = try!(git2::Repository::open(path).map_err(|e| e.to_string()));
         let desc = try!(repo.describe(&git2::DescribeOptions::new().describe_tags())
             .map_err(|e| format!("{} (try --init)", e.message())));
         let tag = try!(desc.format(Some(&git2::DescribeFormatOptions::new()))
             .map_err(|e| e.to_string()));
-        let vers = try!(Version::from_tag(tag));
+        let vers = try!(Version::from_tag(path, tag));
         return Ok(vers);
     }
 
     // from_tag builds from a tagged string
-    pub fn from_tag(tag: String) -> Result<Version, String> {
+    pub fn from_tag(path: &str, tag: String) -> Result<Version, String> {
         let caps = match RE.captures(&tag) {
             None => {
                 return Err(format!("Latest tag '{}' did not match semver format 'v0.0.0'", tag))
@@ -39,6 +41,7 @@ impl Version {
         let minor = caps.name("MINOR").unwrap().parse::<u16>().unwrap();
         let patch = caps.name("PATCH").unwrap().parse::<u16>().unwrap();
         let vers = Version {
+            path: path,
             major: major,
             minor: minor,
             patch: patch,
@@ -62,9 +65,13 @@ impl Version {
         }
     }
 
+    pub fn release_type(&self) -> ReleaseType {
+        return self.rel;
+    }
+
     pub fn set_tag(&self) -> Result<(), String> {
         let spec = "HEAD";
-        let repo = try!(git2::Repository::open(".").map_err(|e| e.to_string()));
+        let repo = try!(git2::Repository::open(self.path).map_err(|e| e.to_string()));
         match repo.describe(&git2::DescribeOptions::new()
             .describe_tags()
             .max_candidates_tags(0)) {
@@ -82,6 +89,7 @@ impl Version {
             major: self.major + 1,
             minor: 0,
             patch: 0,
+            ..*self
         };
     }
 
@@ -93,6 +101,7 @@ impl Version {
             ..*self
         };
     }
+
     fn bump_patch(&self) -> Version {
         return Version {
             rel: ReleaseType::PATCH,
@@ -100,6 +109,16 @@ impl Version {
             ..*self
         };
     }
+}
+
+// TODO complete auth
+pub fn push_tags(path: &str, remote: &str) -> Result<(), String> {
+    let repo = try!(git2::Repository::open(path).map_err(|e| e.to_string()));
+    let mut remote = try!(repo.find_remote(remote).map_err(|e| e.to_string()));
+    try!(remote.push(&[REFSPECS],
+              Some(&mut git2::PushOptions::new().remote_callbacks(git2::RemoteCallbacks::new())))
+        .map_err(|e| e.to_string()));
+    return Ok(());
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -127,7 +146,7 @@ mod tests {
 
     #[test]
     fn smoke() {
-        let ver = Version::from_tag(String::from("v5.5.5")).ok().unwrap();
+        let ver = Version::from_tag(".", "v5.5.5".to_owned()).unwrap();
         assert_eq!("v5.5.6", ver.bump(ReleaseType::PATCH).tag());
         assert_eq!("v5.6.0", ver.bump(ReleaseType::MINOR).tag());
         assert_eq!("v6.0.0", ver.bump(ReleaseType::MAJOR).tag());
