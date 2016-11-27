@@ -1,10 +1,9 @@
-
-#!usr/bin/env python
+#!/usr/bin/env python
 
 '''
 This script has no dependencies besides a connection to github in order to run.
 Therefore it can be copied from the repo and ran on any unix system
-By default it will install to /usr/local/bin/diglet.
+By default it will install to /usr/local/bin/git-bump.
 '''
 import json
 import os
@@ -23,9 +22,13 @@ else:
     bindir = os.path.join(DEFAULT_INSTALL, APP)
 print "Installing {0} into {1}...".format(APP, bindir)
 
-kernel, _, _, _, arch, _ = platform.uname()
-kernel = "apple-darwin"
-dist = "{0}-{1}".format(arch.lower(), kernel.lower())
+kernels = {
+    'darwin': "apple-darwin",
+    'linux': "unknown-linux-gnu"
+}
+krn, _, _, _, arch, _ = platform.uname()
+kernel = kernels.get(krn.lower(), "unknown")
+dist = "{0}-{1}".format(arch.lower(), kernel)
 artifact = "{0}_{1}".format(APP, dist)
 
 # TODO remove static url

@@ -6,11 +6,11 @@ The only _currently_ supported tag format is v.{MAJOR}.{MINOR}.{PATCH}
 
 ## Installation
 
-For OSX, run the following commaned to download the correct binary and put it in your path. To upgrade, run this same script and it will replace the old binary.
+For 64bit OSX & Linux, run the following commaned to download the correct binary and put it in your path. To upgrade, run this same script and it will replace the old binary.
 
-    curl -sSL https://raw.githubusercontent.com/buckhx/git-bump/master/bin/install.py | sudo python - /usr/local/bin
+    curl -sSL https://raw.githubusercontent.com/buckhx/git-bump/master/bin/install.py | python - /usr/local/bin
 
-For Linux, download the latest unknown-linux-gnu binary in [releases](https://github.com/buckhx/git-bump/releases), add executable permissions (chmod +x), rename the binary to git-bump and move it somewhere on your PATH (/usr/local/bin)
+For other platforms see [Building](#building) and move the git-bump binary to somewhere on your PATH (/usr/local/bin)
     
 ## Usage
 
