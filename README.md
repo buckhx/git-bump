@@ -17,21 +17,25 @@ For other platforms see [Building](#building) and move the git-bump binary to so
 Just type git bump and the next patch version will be tagged (v0.2.2 -> v0.2.3).
 
 ```
-$ git bump --help
-git-bump 0.0.3
+$ git bump -h
+git-bump 0.0.7
 Bumps git version with semver semantics
 
 USAGE:
-    git-bump [FLAGS]
+    git-bump [FLAGS] [OPTIONS]
 
 FLAGS:
-    -n, --dry-run    Print result only, do not create tag
-    -h, --help       Prints help information
-        --init       Sets version to v0.0.1
-        --major      Bumps MAJOR version, resets MINOR and PATCH
-        --minor      Bumps MINOR version, resets PATCH
-        --patch      Bumps PATCH [default]
-    -V, --version    Prints version information
+    -n, --dry-run      Print result only, do not create tag
+    -h, --help         Prints help information
+        --init         Sets version to v0.0.1
+        --major        Bumps MAJOR version, resets MINOR and PATCH
+        --minor        Bumps MINOR version, resets PATCH
+        --patch        Bumps PATCH [default]
+        --uninstall    Removes git-bump from the system
+    -V, --version      Prints version information
+
+OPTIONS:
+    -C <path>        Run as if git was started in <path>
 ```
 
 ## Building
